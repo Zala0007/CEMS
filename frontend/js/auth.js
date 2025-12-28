@@ -6,7 +6,11 @@ class AuthManager {
   }
 
   loadCurrentUser() {
+<<<<<<< HEAD
     const userData = localStorage.getItem('cms_current_user');
+=======
+    const userData = sessionStorage.getItem('cms_current_user');
+>>>>>>> recover-last-work
     if (userData) {
       const raw = JSON.parse(userData);
       // If raw has snake_case keys from server, normalize
@@ -23,7 +27,11 @@ class AuthManager {
     
     if (user) {
       this.currentUser = user;
+<<<<<<< HEAD
       localStorage.setItem('cms_current_user', JSON.stringify(user));
+=======
+      sessionStorage.setItem('cms_current_user', JSON.stringify(user));
+>>>>>>> recover-last-work
       return { success: true, user };
     }
     
@@ -32,7 +40,11 @@ class AuthManager {
 
   logout() {
     this.currentUser = null;
+<<<<<<< HEAD
     localStorage.removeItem('cms_current_user');
+=======
+    sessionStorage.removeItem('cms_current_user');
+>>>>>>> recover-last-work
     window.location.href = 'login.html';
   }
 
@@ -53,7 +65,11 @@ class AuthManager {
       const updated = window.dataStorage.updateUser(this.currentUser.id, updatedData);
       if (updated) {
         this.currentUser = { ...this.currentUser, ...updatedData };
+<<<<<<< HEAD
         localStorage.setItem('cms_current_user', JSON.stringify(this.currentUser));
+=======
+        sessionStorage.setItem('cms_current_user', JSON.stringify(this.currentUser));
+>>>>>>> recover-last-work
         return true;
       }
     }
@@ -224,22 +240,78 @@ window.authUtils = {
 // Initialize auth state on page load
 document.addEventListener('DOMContentLoaded', function() {
   // Update navigation based on auth state
+<<<<<<< HEAD
   const userMenus = document.querySelectorAll('#user-menu');
   const adminLinks = document.querySelectorAll('.admin-only');
   const userNameElements = document.querySelectorAll('#user-name');
+=======
+  const userMenu = document.querySelector('#user-menu');
+  const userNameElements = document.querySelectorAll('#user-name');
+  const loginButtons = document.querySelectorAll('.login-btn');
+  const adminLinks = document.querySelectorAll('.admin-only');
+>>>>>>> recover-last-work
   
   if (window.authManager.isLoggedIn()) {
     const user = window.authManager.getCurrentUser();
     
+<<<<<<< HEAD
     // Update user name in navigation
+=======
+    // Update user name in navigation (for pages that have #user-name span)
+>>>>>>> recover-last-work
     userNameElements.forEach(el => {
       el.textContent = user.fullName || user.username;
     });
     
+<<<<<<< HEAD
+=======
+    // Update user menu
+    if (userMenu) {
+      // If user menu doesn't have a nested span, update the whole link
+      if (userNameElements.length === 0) {
+        userMenu.innerHTML = `<i class="fas fa-user"></i> ${user.fullName || user.username}`;
+      }
+      userMenu.href = '#';
+      userMenu.classList.remove('login-btn');
+      
+      // Remove existing listener if any
+      const newUserMenu = userMenu.cloneNode(true);
+      userMenu.parentNode.replaceChild(newUserMenu, userMenu);
+      
+      newUserMenu.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (confirm('Are you sure you want to logout?')) {
+          window.authManager.logout();
+        }
+      });
+    }
+    
+    // Update all login buttons to show username
+    loginButtons.forEach(btn => {
+      if (btn !== userMenu) {
+        btn.innerHTML = `<i class="fas fa-user"></i> ${user.fullName || user.username}`;
+        btn.href = '#';
+        btn.classList.remove('login-btn');
+        
+        // Remove existing listener if any
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        
+        newBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (confirm('Are you sure you want to logout?')) {
+            window.authManager.logout();
+          }
+        });
+      }
+    });
+    
+>>>>>>> recover-last-work
     // Show admin links if user is admin
     if (window.authManager.isAdmin()) {
       adminLinks.forEach(link => link.style.display = '');
     }
+<<<<<<< HEAD
     
     // Add logout functionality to user menu
     userMenus.forEach(menu => {
@@ -250,15 +322,30 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
     });
+=======
+>>>>>>> recover-last-work
   } else {
     // Hide admin links
     adminLinks.forEach(link => link.style.display = 'none');
     
+<<<<<<< HEAD
     // Update login links
     userMenus.forEach(menu => {
       menu.href = 'login.html';
       menu.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
     });
+=======
+    // Reset user menu to login
+    if (userMenu && userNameElements.length === 0) {
+      userMenu.href = 'login.html';
+      userMenu.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+      userMenu.classList.add('login-btn');
+    } else {
+      userNameElements.forEach(el => {
+        el.textContent = 'Guest';
+      });
+    }
+>>>>>>> recover-last-work
   }
   
   // Setup alert close functionality

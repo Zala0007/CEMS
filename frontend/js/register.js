@@ -70,7 +70,11 @@ class RegisterPage {
       // Normalize and store
       const rawUser = loginData.user || loginData;
   const user = window.authUtils.normalizeUser(rawUser) || rawUser;
+<<<<<<< HEAD
   localStorage.setItem('cms_current_user', JSON.stringify(user));
+=======
+  sessionStorage.setItem('cms_current_user', JSON.stringify(user));
+>>>>>>> recover-last-work
   if (window.authManager) window.authManager.currentUser = user;
   console.log('Registration + login: user saved', user);
   window.location.href = 'index.html';

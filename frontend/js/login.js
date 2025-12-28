@@ -105,7 +105,11 @@ class LoginPage {
   // Save user locally (normalize server response)
   const rawUser = json.user || json;
   const user = window.authUtils.normalizeUser(rawUser) || rawUser;
+<<<<<<< HEAD
   localStorage.setItem('cms_current_user', JSON.stringify(user));
+=======
+  sessionStorage.setItem('cms_current_user', JSON.stringify(user));
+>>>>>>> recover-last-work
   // Update in-memory auth manager so app recognizes the user immediately
   if (window.authManager) window.authManager.currentUser = user;
   console.log('Login successful, user saved:', user);

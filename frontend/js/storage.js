@@ -542,6 +542,7 @@ class DataStorage {
       if (!Array.isArray(bookings)) return false;
 
       // Map server booking fields (snake_case) to local booking shape
+<<<<<<< HEAD
       const mapped = bookings.map(b => ({
         id: b.id,
         hallId: b.hall_id,
@@ -563,6 +564,12 @@ class DataStorage {
         // Reuse addItem which will preserve provided id
         this.addItem('cms_bookings', b);
       });
+=======
+      const mapped = bookings.map(b => this.serverToBooking(b));
+
+      // Replace localStorage bookings with server data
+      this.setData('cms_bookings', mapped);
+>>>>>>> recover-last-work
 
       return true;
     } catch (err) {
@@ -570,6 +577,59 @@ class DataStorage {
       return false;
     }
   }
+<<<<<<< HEAD
+=======
+
+  // Sync events from backend API and store them locally.
+  async syncEventsFromServer({ apiBase } = {}) {
+    const API_BASE = apiBase || window.API_BASE || 'http://localhost:8000';
+    try {
+      const resp = await fetch(`${API_BASE}/api/events`);
+      if (!resp.ok) {
+        console.warn('Failed to fetch events from server:', resp.status);
+        return false;
+      }
+      const events = await resp.json();
+      if (!Array.isArray(events)) return false;
+
+      // Map server event fields to local event shape
+      const mapped = events.map(e => this.serverToEvent(e));
+
+      // Replace localStorage events with server data
+      this.setData('cms_events', mapped);
+
+      return true;
+    } catch (err) {
+      console.warn('Error syncing events from server:', err);
+      return false;
+    }
+  }
+
+  // Sync halls from backend API and store them locally.
+  async syncHallsFromServer({ apiBase } = {}) {
+    const API_BASE = apiBase || window.API_BASE || 'http://localhost:8000';
+    try {
+      const resp = await fetch(`${API_BASE}/api/halls`);
+      if (!resp.ok) {
+        console.warn('Failed to fetch halls from server:', resp.status);
+        return false;
+      }
+      const halls = await resp.json();
+      if (!Array.isArray(halls)) return false;
+
+      // Map server hall fields to local hall shape
+      const mapped = halls.map(h => this.serverToHall(h));
+
+      // Replace localStorage halls with server data
+      this.setData('cms_halls', mapped);
+
+      return true;
+    } catch (err) {
+      console.warn('Error syncing halls from server:', err);
+      return false;
+    }
+  }
+>>>>>>> recover-last-work
 }
 
 // Create global instance

@@ -12,10 +12,26 @@ class CalendarPage {
   init() {
     this.setupCalendarControls();
     this.setupFilters();
+<<<<<<< HEAD
     // Ensure bookings are synced from backend first so calendar shows server data
     if (window.dataStorage && typeof window.dataStorage.syncBookingsFromServer === 'function') {
       // fire-and-forget but render after sync completes
       window.dataStorage.syncBookingsFromServer({ apiBase: window.API_BASE }).then(() => {
+=======
+    // Sync both events and bookings from backend first so calendar shows server data
+    const syncPromises = [];
+    if (window.dataStorage) {
+      if (typeof window.dataStorage.syncEventsFromServer === 'function') {
+        syncPromises.push(window.dataStorage.syncEventsFromServer({ apiBase: window.API_BASE }));
+      }
+      if (typeof window.dataStorage.syncBookingsFromServer === 'function') {
+        syncPromises.push(window.dataStorage.syncBookingsFromServer({ apiBase: window.API_BASE }));
+      }
+    }
+    
+    if (syncPromises.length > 0) {
+      Promise.all(syncPromises).then(() => {
+>>>>>>> recover-last-work
         this.renderCalendar();
         this.loadSelectedDateData();
       }).catch(() => {

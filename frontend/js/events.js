@@ -101,6 +101,7 @@ class EventsPage {
     const eventsGrid = document.getElementById('events-grid');
     const noResults = document.getElementById('no-results');
 
+<<<<<<< HEAD
     if (!eventsGrid) return;
 
     // Build API URL with current filters
@@ -108,6 +109,16 @@ class EventsPage {
       const base = window.location.origin;
       const apiPath = '/Campus Event Management System/Backend/public/index.php/events';
       const url = new URL(base + apiPath);
+=======
+    if (!eventsGrid) {
+      console.error('Events grid not found!');
+      return;
+    }
+
+    try {
+      const API_BASE = window.API_BASE || 'http://localhost:8000';
+      const url = new URL(`${API_BASE}/api/events`);
+>>>>>>> recover-last-work
 
       // add supported query params
       const q = this.currentFilters || {};
@@ -117,6 +128,7 @@ class EventsPage {
       if (q.dateFrom) url.searchParams.set('dateFrom', q.dateFrom);
       if (q.dateTo) url.searchParams.set('dateTo', q.dateTo);
 
+<<<<<<< HEAD
       const res = await fetch(encodeURI(url.toString()), { credentials: 'include' });
       if (!res.ok) {
         console.error('Events API returned', res.status);
@@ -129,11 +141,34 @@ class EventsPage {
 
       // If backend returns an object with error
       if (!Array.isArray(events) || events.length === 0) {
+=======
+      console.log('Fetching events from:', url.toString());
+      
+      const res = await fetch(url.toString());
+      console.log('Response status:', res.status);
+      
+      if (!res.ok) {
+        throw new Error(`API returned ${res.status}`);
+      }
+
+      const events = await res.json();
+      console.log('Events received:', events.length, 'events');
+
+      if (!Array.isArray(events)) {
+        console.error('Response is not an array:', events);
+        throw new Error('Invalid response format');
+      }
+
+      if (events.length === 0) {
+        console.log('No events found');
+        eventsGrid.innerHTML = '';
+>>>>>>> recover-last-work
         eventsGrid.style.display = 'none';
         if (noResults) noResults.style.display = 'block';
         return;
       }
 
+<<<<<<< HEAD
       // Sort events (same logic as before)
       events.sort((a, b) => {
         let aVal = a[this.sortBy];
@@ -160,10 +195,35 @@ class EventsPage {
       console.error('Failed loading events', err);
       if (noResults) noResults.style.display = 'block';
       eventsGrid.style.display = 'none';
+=======
+      // Sort events by date
+      events.sort((a, b) => {
+        const dateA = new Date(a.date + ' ' + a.time);
+        const dateB = new Date(b.date + ' ' + b.time);
+        return dateB - dateA;
+      });
+
+      // Show grid, hide no results
+      eventsGrid.style.display = 'grid';
+      if (noResults) noResults.style.display = 'none';
+
+      // Render events
+      const html = events.map(event => this.createEventCard(event)).join('');
+      eventsGrid.innerHTML = html;
+      
+      console.log('Successfully rendered', events.length, 'events');
+      
+      this.addEventCardListeners();
+    } catch (err) {
+      console.error('Error loading events:', err);
+      eventsGrid.innerHTML = '<div style="grid-column: 1/-1; padding: 20px; text-align: center; color: red;">Error loading events: ' + err.message + '</div>';
+      eventsGrid.style.display = 'block';
+>>>>>>> recover-last-work
     }
   }
 
   createEventCard(event) {
+<<<<<<< HEAD
     const currentUser = window.authManager.getCurrentUser();
     const canEdit = currentUser && (currentUser.role === 'admin' || event.createdBy === currentUser.username);
     
@@ -220,6 +280,81 @@ class EventsPage {
         </div>
       </div>
     `;
+=======
+    try {
+      const currentUser = window.authManager.getCurrentUser();
+      const canEdit = currentUser && (currentUser.role === 'admin' || event.created_by === currentUser.id);
+      
+      const eventDate = new Date(event.date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      let dateLabel = event.date || 'No date';
+      try {
+        dateLabel = window.authUtils && window.authUtils.formatDate ? window.authUtils.formatDate(event.date) : event.date;
+        const daysDiff = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff === 0) dateLabel = 'Today';
+        else if (daysDiff === 1) dateLabel = 'Tomorrow';
+        else if (daysDiff === -1) dateLabel = 'Yesterday';
+      } catch (e) {
+        console.error('Date formatting error:', e);
+      }
+
+      let timeLabel = event.time || '';
+      try {
+        timeLabel = window.authUtils && window.authUtils.formatTime ? window.authUtils.formatTime(event.time) : event.time;
+      } catch (e) {
+        console.error('Time formatting error:', e);
+      }
+
+      return `
+        <div class="event-card" data-event-id="${event.id}">
+          <div class="event-header">
+            <span class="event-category ${event.category}">${event.category}</span>
+            <span class="event-status status-${event.status}">${event.status}</span>
+          </div>
+          <div class="event-content">
+            <h3 class="event-title">${event.title || 'Untitled Event'}</h3>
+            <p class="event-description">${event.description || ''}</p>
+          </div>
+          <div class="event-meta">
+            <div class="event-info">
+              <i class="fas fa-calendar-alt"></i>
+              <span>${dateLabel}</span>
+            </div>
+            <div class="event-info">
+              <i class="fas fa-clock"></i>
+              <span>${timeLabel}</span>
+            </div>
+            <div class="event-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>${event.venue || 'TBA'}</span>
+            </div>
+            <div class="event-info">
+              <i class="fas fa-user"></i>
+              <span>${event.organizer || 'Unknown'}</span>
+            </div>
+            ${canEdit ? `
+              <div class="event-actions">
+                <button class="btn btn-sm btn-outline edit-event-btn" data-event-id="${event.id}">
+                  <i class="fas fa-edit"></i>
+                  Edit
+                </button>
+                <button class="btn btn-sm btn-error delete-event-btn" data-event-id="${event.id}">
+                  <i class="fas fa-trash"></i>
+                  Delete
+                </button>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error creating event card:', error, event);
+      return `<div class="event-card error">Error rendering event: ${event.title || event.id}</div>`;
+    }
+>>>>>>> recover-last-work
   }
 
   addEventCardListeners() {
@@ -252,11 +387,21 @@ class EventsPage {
     });
   }
 
+<<<<<<< HEAD
   openEventModal(eventId = null) {
+=======
+  async openEventModal(eventId = null) {
+>>>>>>> recover-last-work
     const modal = document.getElementById('event-modal');
     const modalTitle = document.getElementById('modal-title');
     const eventForm = document.getElementById('event-form');
     
+<<<<<<< HEAD
+=======
+    // Load halls into venue dropdown
+    await this.loadVenueOptions();
+    
+>>>>>>> recover-last-work
     if (eventId) {
       // Edit mode
       const event = window.dataStorage.getEventById(eventId);
@@ -274,6 +419,46 @@ class EventsPage {
     window.modalManager.openModal('event-modal');
   }
 
+<<<<<<< HEAD
+=======
+  async loadVenueOptions() {
+    const venueSelect = document.getElementById('event-venue');
+    const API_BASE = window.API_BASE || 'http://localhost:8000';
+    
+    try {
+      const response = await fetch(`${API_BASE}/api/halls`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch halls');
+      }
+      
+      const halls = await response.json();
+      
+      // Clear existing options except the first one (placeholder)
+      venueSelect.innerHTML = '<option value="">Select a hall...</option>';
+      
+      // Check if halls is an array
+      if (!Array.isArray(halls) || halls.length === 0) {
+        console.warn('No halls available');
+        return;
+      }
+      
+      // Add hall options
+      halls.forEach(hall => {
+        const option = document.createElement('option');
+        option.value = hall.name;
+        option.textContent = `${hall.name} (Capacity: ${hall.capacity})`;
+        venueSelect.appendChild(option);
+      });
+      
+    } catch (error) {
+      console.error('Error loading halls:', error);
+      if (window.AlertManager) {
+        window.AlertManager.show('Failed to load halls', 'error');
+      }
+    }
+  }
+
+>>>>>>> recover-last-work
   populateEventForm(event) {
     document.getElementById('event-id').value = event.id;
     document.getElementById('event-title').value = event.title;
@@ -296,9 +481,12 @@ class EventsPage {
     window.LoadingManager.show(submitBtn);
 
     try {
+<<<<<<< HEAD
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 800));
 
+=======
+>>>>>>> recover-last-work
       const formData = window.FormUtils.getFormData('event-form');
       const eventId = formData['event-id'];
       const currentUser = window.authManager.getCurrentUser();
@@ -311,6 +499,7 @@ class EventsPage {
         time: formData.time,
         venue: formData.venue,
         organizer: formData.organizer,
+<<<<<<< HEAD
         status: 'upcoming'
       };
 
@@ -323,6 +512,41 @@ class EventsPage {
         eventData.createdBy = currentUser.username;
         eventData.createdAt = new Date().toISOString();
         window.dataStorage.addEvent(eventData);
+=======
+        status: 'upcoming',
+        created_by: currentUser?.id || 1
+      };
+
+      const API_BASE = window.API_BASE || 'http://localhost:8000';
+      
+      if (eventId) {
+        // Update existing event via API
+        const resp = await fetch(`${API_BASE}/api/events/${eventId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(eventData)
+        });
+        
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: 'Unknown error' }));
+          throw new Error(err.error || `Server error: ${resp.status}`);
+        }
+        
+        window.authUtils.showAlert('Event updated successfully!', 'success');
+      } else {
+        // Create new event via API
+        const resp = await fetch(`${API_BASE}/api/events`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(eventData)
+        });
+        
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: 'Unknown error' }));
+          throw new Error(err.error || `Server error: ${resp.status}`);
+        }
+        
+>>>>>>> recover-last-work
         window.authUtils.showAlert('Event created successfully!', 'success');
       }
 
@@ -331,7 +555,11 @@ class EventsPage {
 
     } catch (error) {
       console.error('Event submission error:', error);
+<<<<<<< HEAD
       window.authUtils.showAlert('An error occurred. Please try again.', 'error');
+=======
+      window.authUtils.showAlert(error.message || 'Failed to save event. Please check if the backend server is running.', 'error');
+>>>>>>> recover-last-work
     } finally {
       window.LoadingManager.hide(submitBtn);
     }
@@ -349,12 +577,28 @@ class EventsPage {
     if (!confirmed) return;
 
     try {
+<<<<<<< HEAD
       window.dataStorage.deleteEvent(eventId);
+=======
+      const API_BASE = window.API_BASE || 'http://localhost:8000';
+      const resp = await fetch(`${API_BASE}/api/events/${eventId}`, { method: 'DELETE' });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to delete event');
+      }
+>>>>>>> recover-last-work
       window.authUtils.showAlert('Event deleted successfully!', 'success');
       this.loadEvents();
     } catch (error) {
       console.error('Delete error:', error);
+<<<<<<< HEAD
       window.authUtils.showAlert('Error deleting event. Please try again.', 'error');
+=======
+      // Fallback to local delete
+      window.dataStorage.deleteEvent(eventId);
+      window.authUtils.showAlert('Event deleted locally', 'warning');
+      this.loadEvents();
+>>>>>>> recover-last-work
     }
   }
 

@@ -168,3 +168,173 @@
     <script src="js/halls.js"></script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hall Booking - College Event Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>College Events</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="events.html" class="nav-link">Events</a></li>
+                    <li><a href="halls.html" class="nav-link active">Halls</a></li>
+                    <li><a href="calendar.html" class="nav-link">Calendar</a></li>
+                    <li><a href="admin.html" class="nav-link admin-only" style="display: none;">Admin</a></li>
+                    <li><a href="#" class="nav-link" id="user-menu">
+                        <i class="fas fa-user"></i>
+                        <span id="user-name">Guest</span>
+                    </a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Hall Booking</h1>
+                <div class="page-actions">
+                    <button class="btn btn-primary" id="book-hall-btn">
+                        <i class="fas fa-plus"></i>
+                        Book Hall
+                    </button>
+                </div>
+            </div>
+
+            <div class="booking-section">
+                <div class="booking-grid">
+                    <div class="halls-panel">
+                        <h2 class="panel-title">Available Halls</h2>
+                        <div class="halls-list" id="halls-list">
+                            <!-- Halls will be loaded dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="bookings-panel">
+                        <h2 class="panel-title">My Bookings</h2>
+                        <div class="booking-filters">
+                            <select class="form-select" id="booking-filter">
+                                <option value="">All Bookings</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="bookings-list" id="bookings-list">
+                            <!-- Bookings will be loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="booking-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Book Hall</h3>
+                <button class="modal-close" id="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="booking-form">
+                <input type="hidden" id="hall-id" name="hall-id">
+                <div class="hall-info" id="hall-info">
+                    <!-- Hall details will be shown here -->
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Purpose</label>
+                    <input type="text" class="form-input" id="booking-purpose" name="purpose" required>
+                    <span class="error-message" id="purpose-error"></span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-input" id="booking-date" name="date" required>
+                        <span class="error-message" id="date-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Duration</label>
+                        <select class="form-select" id="booking-duration" name="duration" required>
+                            <option value="">Select Duration</option>
+                            <option value="1">1 Hour</option>
+                            <option value="2">2 Hours</option>
+                            <option value="3">3 Hours</option>
+                            <option value="4">4 Hours</option>
+                            <option value="full-day">Full Day</option>
+                        </select>
+                        <span class="error-message" id="duration-error"></span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Start Time</label>
+                        <select class="form-select" id="booking-time" name="time" required>
+                            <option value="">Select Time</option>
+                            <option value="09:00">09:00 AM</option>
+                            <option value="10:00">10:00 AM</option>
+                            <option value="11:00">11:00 AM</option>
+                            <option value="12:00">12:00 PM</option>
+                            <option value="13:00">01:00 PM</option>
+                            <option value="14:00">02:00 PM</option>
+                            <option value="15:00">03:00 PM</option>
+                            <option value="16:00">04:00 PM</option>
+                            <option value="17:00">05:00 PM</option>
+                        </select>
+                        <span class="error-message" id="time-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Expected Attendees</label>
+                        <input type="number" class="form-input" id="booking-attendees" name="attendees" min="1" required>
+                        <span class="error-message" id="attendees-error"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Additional Requirements</label>
+                    <textarea class="form-textarea" id="booking-requirements" name="requirements" rows="3" placeholder="Special requirements, equipment needed, etc."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-text">Submit Booking</span>
+                        <i class="fas fa-spinner fa-spin btn-spinner" style="display: none;"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert" id="alert">
+        <div class="alert-content">
+            <i class="alert-icon"></i>
+            <span class="alert-message"></span>
+        </div>
+        <button class="alert-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/halls.js"></script>
+</body>
+</html>

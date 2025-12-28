@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.sql": "mysql"
+  },
+  "mssql.intelliSense.enableIntellisense": false,
+  "mssql.query.displayBitAsNumber": true,
+  "[sql]": {
+    "editor.defaultFormatter": null
+  }
+}

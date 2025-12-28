@@ -58,12 +58,23 @@ CREATE TABLE IF NOT EXISTS bookings (
 );
 
 -- Seed data
+<<<<<<< HEAD
 INSERT INTO users (username, password_hash, full_name, email, role)
 VALUES
   ('admin', '$2y$10$8cWc5Y0zv0H5mC0mWq0nQe5y9m7J1v1Z4c0sR0uIqvYb9uTz5zIyu', 'Administrator', 'admin@college.edu', 'admin'),
   ('student', '$2y$10$7H8iYb3mJZ3nP6q9Xy1o0uU2Wf6H8J9K0lMn1Op2QrSt3Uv4WxYZa', 'John Student', 'student@college.edu', 'student');
 
 -- Note: password hashes correspond to placeholder values. Update with real hashes.
+=======
+-- Password for admin: admin123, Password for student: student123
+-- These are bcrypt hashes generated with PHP's password_hash()
+INSERT IGNORE INTO users (id, username, password_hash, full_name, email, role)
+VALUES
+  (1, 'admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrator', 'admin@college.edu', 'admin'),
+  (2, 'student', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'John Student', 'student@college.edu', 'student');
+
+-- Note: The above hash is for 'password'. For demo purposes both users use 'password' as their password.
+>>>>>>> recover-last-work
 
 INSERT INTO halls (name, capacity, location, facilities, is_available) VALUES
   ('Main Auditorium', 500, 'Annexe Building, Ground Floor', JSON_ARRAY('projector','sound-system','air-conditioning','stage'), 1),
@@ -72,4 +83,18 @@ INSERT INTO halls (name, capacity, location, facilities, is_available) VALUES
   ('Sports Ground', 300, 'Sports Ground', JSON_ARRAY('sound-system','lighting'), 1),
   ('Library', 80, 'Library Building', JSON_ARRAY('wifi','air-conditioning'), 1);
 
+<<<<<<< HEAD
+=======
+-- Sample events
+INSERT IGNORE INTO events (title, description, category, date, time, venue, organizer, status, created_by) VALUES
+  ('Annual Tech Symposium 2025', 'A comprehensive technical symposium featuring presentations on emerging technologies, AI innovations, and software development best practices.', 'academic', '2025-01-15', '09:00:00', 'Main Auditorium', 'Computer Science Department', 'upcoming', 1),
+  ('Cultural Fest - Rhythms of Unity', 'Join us for an evening of music, dance, and cultural performances celebrating diversity and student talent.', 'cultural', '2025-01-20', '17:00:00', 'Main Auditorium', 'Cultural Committee', 'upcoming', 1),
+  ('Inter-College Basketball Tournament', 'Annual basketball championship featuring teams from various colleges competing for the trophy.', 'sports', '2025-01-25', '08:00:00', 'Sports Ground', 'Sports Department', 'upcoming', 1),
+  ('Web Development Workshop', 'Hands-on workshop covering modern web development frameworks, React, Node.js, and deployment strategies.', 'workshop', '2025-02-05', '10:00:00', 'Conference Hall', 'IT Club', 'upcoming', 1),
+  ('Career Guidance Seminar', 'Industry experts share insights on career opportunities, interview preparation, and professional development.', 'seminar', '2025-02-10', '14:00:00', 'Conference Hall', 'Placement Cell', 'upcoming', 1),
+  ('Machine Learning Bootcamp', 'Intensive 3-day bootcamp on machine learning fundamentals, algorithms, and practical applications.', 'workshop', '2025-02-15', '09:30:00', 'Seminar Room 1', 'AI Research Group', 'upcoming', 1),
+  ('Spring Fest Opening Ceremony', 'Grand opening of the annual spring festival with celebrity performances and entertainment.', 'cultural', '2025-03-01', '18:00:00', 'Main Auditorium', 'Student Council', 'upcoming', 1),
+  ('Entrepreneurship Summit', 'Learn from successful entrepreneurs about starting and scaling businesses, funding, and innovation.', 'seminar', '2025-03-10', '11:00:00', 'Conference Hall', 'E-Cell', 'upcoming', 1);
+
+>>>>>>> recover-last-work
 

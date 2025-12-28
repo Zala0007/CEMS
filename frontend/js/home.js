@@ -42,6 +42,7 @@ class HomePage {
     }, 16);
   }
 
+<<<<<<< HEAD
   loadUpcomingEvents() {
     const eventsGrid = document.getElementById('events-grid');
     if (!eventsGrid) return;
@@ -67,6 +68,56 @@ class HomePage {
     
     // Add hover animations
     this.addEventCardAnimations();
+=======
+  async loadUpcomingEvents() {
+    const eventsGrid = document.getElementById('events-grid');
+    if (!eventsGrid) return;
+
+    try {
+      const API_BASE = window.API_BASE || 'http://localhost:8000';
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Fetch events from backend
+      const response = await fetch(`${API_BASE}/api/events`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch events');
+      }
+      
+      const result = await response.json();
+      let events = result.data || result || [];
+      
+      // Filter for upcoming events only (future dates and upcoming status)
+      events = events
+        .filter(event => event.date >= today && event.status === 'upcoming')
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(0, 6); // Show only 6 events on homepage
+
+      if (events.length === 0) {
+        eventsGrid.innerHTML = `
+          <div class="no-events">
+            <i class="fas fa-calendar-times"></i>
+            <h3>No Upcoming Events</h3>
+            <p>Check back later for new events or <a href="events.html">view all events</a>.</p>
+          </div>
+        `;
+        return;
+      }
+
+      eventsGrid.innerHTML = events.map(event => this.createEventCard(event)).join('');
+      
+      // Add hover animations
+      this.addEventCardAnimations();
+    } catch (error) {
+      console.error('Error loading upcoming events:', error);
+      eventsGrid.innerHTML = `
+        <div class="no-events">
+          <i class="fas fa-exclamation-circle"></i>
+          <h3>Failed to Load Events</h3>
+          <p>Please try again later or <a href="events.html">view all events</a>.</p>
+        </div>
+      `;
+    }
+>>>>>>> recover-last-work
   }
 
   createEventCard(event) {

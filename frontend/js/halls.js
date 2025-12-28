@@ -3,20 +3,41 @@ class HallsPage {
   constructor() {
     this.selectedHall = null;
     this.currentUser = null;
+<<<<<<< HEAD
+=======
+    this.editingHallId = null;
+>>>>>>> recover-last-work
     this.init();
   }
 
   init() {
     this.currentUser = window.authManager.getCurrentUser();
+<<<<<<< HEAD
+=======
+    this.checkAuthState();
+    this.setupHallManagementModal();
+>>>>>>> recover-last-work
     this.setupBookingModal();
     this.loadHalls();
     this.loadBookings();
     this.setupBookingFilters();
+<<<<<<< HEAD
     this.checkAuthState();
+=======
+>>>>>>> recover-last-work
   }
 
   checkAuthState() {
     const bookHallBtn = document.getElementById('book-hall-btn');
+<<<<<<< HEAD
+=======
+    const addHallBtn = document.getElementById('add-hall-btn');
+    
+    console.log('checkAuthState called');
+    console.log('currentUser:', this.currentUser);
+    console.log('addHallBtn found:', !!addHallBtn);
+    
+>>>>>>> recover-last-work
     if (bookHallBtn) {
       if (!window.authManager.isLoggedIn()) {
         bookHallBtn.style.display = 'none';
@@ -32,6 +53,229 @@ class HallsPage {
         }
       }
     }
+<<<<<<< HEAD
+=======
+    
+    // Show add hall button only for admins
+    if (addHallBtn) {
+      if (this.currentUser && this.currentUser.role === 'admin') {
+        console.log('User is admin, showing add hall button');
+        addHallBtn.style.display = 'inline-flex';
+      } else {
+        console.log('User is not admin, hiding add hall button');
+        addHallBtn.style.display = 'none';
+      }
+    }
+  }
+
+  setupHallManagementModal() {
+    const addHallBtn = document.getElementById('add-hall-btn');
+    const hallModal = document.getElementById('hall-modal');
+    const hallForm = document.getElementById('hall-form');
+    const hallCancelBtn = document.getElementById('hall-cancel-btn');
+    const hallModalClose = document.getElementById('hall-modal-close');
+
+    // Open modal for adding new hall
+    if (addHallBtn) {
+      addHallBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Add Hall button clicked');
+        this.openHallModal();
+      });
+    } else {
+      console.warn('Add Hall button not found');
+    }
+
+    // Close modal
+    [hallCancelBtn, hallModalClose].forEach(btn => {
+      if (btn) {
+        btn.addEventListener('click', () => {
+          window.modalManager.closeModal('hall-modal');
+          this.resetHallForm();
+        });
+      }
+    });
+
+    // Handle form submission
+    if (hallForm) {
+      hallForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.handleHallSubmit();
+      });
+    }
+  }
+
+  openHallModal(hall = null) {
+    console.log('openHallModal called', hall);
+    const modalTitle = document.getElementById('hall-modal-title');
+    const submitText = document.getElementById('hall-submit-text');
+    
+    if (!modalTitle || !submitText) {
+      console.error('Modal elements not found');
+      return;
+    }
+    
+    if (hall) {
+      // Edit mode
+      this.editingHallId = hall.id;
+      modalTitle.textContent = 'Edit Hall';
+      submitText.textContent = 'Update Hall';
+      this.populateHallForm(hall);
+    } else {
+      // Add mode
+      this.editingHallId = null;
+      modalTitle.textContent = 'Add New Hall';
+      submitText.textContent = 'Add Hall';
+      this.resetHallForm();
+    }
+    
+    if (window.modalManager) {
+      console.log('Opening modal via modalManager');
+      window.modalManager.openModal('hall-modal');
+    } else {
+      console.error('modalManager not found, showing modal directly');
+      const modal = document.getElementById('hall-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+      }
+    }
+  }
+
+  populateHallForm(hall) {
+    document.getElementById('edit-hall-id').value = hall.id;
+    document.getElementById('hall-name').value = hall.name;
+    document.getElementById('hall-capacity').value = hall.capacity;
+    document.getElementById('hall-location').value = hall.location;
+    document.getElementById('hall-availability').value = hall.isAvailable ? '1' : '0';
+    
+    // Set facilities checkboxes
+    const facilityCheckboxes = document.querySelectorAll('input[name="facilities"]');
+    facilityCheckboxes.forEach(checkbox => {
+      checkbox.checked = hall.facilities.includes(checkbox.value);
+    });
+  }
+
+  resetHallForm() {
+    document.getElementById('hall-form').reset();
+    document.getElementById('edit-hall-id').value = '';
+    this.editingHallId = null;
+  }
+
+  async handleHallSubmit() {
+    const API_BASE = window.API_BASE || 'http://localhost:8000';
+    
+    // Check if user is admin
+    if (!this.currentUser || this.currentUser.role !== 'admin') {
+      window.authUtils.showAlert('Only administrators can manage halls', 'error');
+      return;
+    }
+
+    // Gather form data
+    const name = document.getElementById('hall-name').value.trim();
+    const capacity = parseInt(document.getElementById('hall-capacity').value);
+    const location = document.getElementById('hall-location').value.trim();
+    const isAvailable = document.getElementById('hall-availability').value === '1';
+    
+    // Get selected facilities
+    const facilities = Array.from(document.querySelectorAll('input[name="facilities"]:checked'))
+      .map(cb => cb.value);
+
+    const hallData = {
+      name,
+      capacity,
+      location,
+      facilities,
+      isAvailable
+    };
+
+    console.log('Submitting hall data:', hallData);
+
+    // Show loading
+    const submitBtn = document.querySelector('#hall-form button[type="submit"]');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnSpinner = submitBtn.querySelector('.btn-spinner');
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    submitBtn.disabled = true;
+
+    try {
+      const url = this.editingHallId 
+        ? `${API_BASE}/api/halls/${this.editingHallId}`
+        : `${API_BASE}/api/halls`;
+      
+      const method = this.editingHallId ? 'PUT' : 'POST';
+      
+      console.log(`${method} request to:`, url);
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(hallData)
+      });
+
+      console.log('Response status:', response.status);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Hall saved successfully:', result);
+        window.authUtils.showAlert(
+          this.editingHallId ? 'Hall updated successfully!' : 'Hall added successfully!',
+          'success'
+        );
+        window.modalManager.closeModal('hall-modal');
+        this.resetHallForm();
+        await this.loadHalls();
+      } else {
+        const error = await response.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('Failed to save hall:', error);
+        window.authUtils.showAlert(error.message || 'Failed to save hall', 'error');
+      }
+    } catch (error) {
+      console.error('Error saving hall:', error);
+      window.authUtils.showAlert('Failed to save hall. Please try again.', 'error');
+    } finally {
+      btnText.style.display = 'inline';
+      btnSpinner.style.display = 'none';
+      submitBtn.disabled = false;
+    }
+  }
+
+  async deleteHall(hallId) {
+    if (!confirm('Are you sure you want to delete this hall? This action cannot be undone.')) {
+      return;
+    }
+
+    const API_BASE = window.API_BASE || 'http://localhost:8000';
+    
+    // Check if user is admin
+    if (!this.currentUser || this.currentUser.role !== 'admin') {
+      window.authUtils.showAlert('Only administrators can delete halls', 'error');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/api/halls/${hallId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        window.authUtils.showAlert('Hall deleted successfully!', 'success');
+        await this.loadHalls();
+      } else {
+        const error = await response.json().catch(() => ({ message: 'Unknown error' }));
+        window.authUtils.showAlert(error.message || 'Failed to delete hall', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting hall:', error);
+      window.authUtils.showAlert('Failed to delete hall. Please try again.', 'error');
+    }
+>>>>>>> recover-last-work
   }
 
   setupBookingModal() {
@@ -42,13 +286,35 @@ class HallsPage {
 
     // Open modal for booking
     if (bookHallBtn) {
+<<<<<<< HEAD
       bookHallBtn.addEventListener('click', () => {
+=======
+      bookHallBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Book Hall button clicked');
+        console.log('Selected hall:', this.selectedHall);
+        
+        if (!window.authManager.isLoggedIn()) {
+          window.authUtils.showAlert('Please login to book a hall', 'warning');
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1500);
+          return;
+        }
+        
+>>>>>>> recover-last-work
         if (!this.selectedHall) {
           window.authUtils.showAlert('Please select a hall first', 'warning');
           return;
         }
         this.openBookingModal();
       });
+<<<<<<< HEAD
+=======
+    } else {
+      console.warn('Book Hall button not found');
+>>>>>>> recover-last-work
     }
 
     // Close modal
@@ -91,11 +357,39 @@ class HallsPage {
     }
   }
 
+<<<<<<< HEAD
   loadHalls() {
     const hallsList = document.getElementById('halls-list');
     if (!hallsList) return;
 
     const halls = window.dataStorage.getHalls();
+=======
+  async loadHalls() {
+    const hallsList = document.getElementById('halls-list');
+    if (!hallsList) return;
+
+    // Try to fetch halls from backend API first
+    let halls = [];
+    const API_BASE = window.API_BASE || 'http://localhost:8000';
+    try {
+      const resp = await fetch(`${API_BASE}/api/halls`);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data)) {
+          halls = data.map(h => window.dataStorage.serverToHall ? window.dataStorage.serverToHall(h) : h);
+          // Update localStorage with fresh data
+          localStorage.setItem('cms_halls', JSON.stringify(halls));
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch halls from backend, using localStorage:', err);
+    }
+    
+    // Fallback to localStorage if backend failed
+    if (halls.length === 0) {
+      halls = window.dataStorage.getHalls();
+    }
+>>>>>>> recover-last-work
     
     if (halls.length === 0) {
       hallsList.innerHTML = `
@@ -117,6 +411,19 @@ class HallsPage {
       `<span class="facility-tag">${this.formatFacilityName(facility)}</span>`
     ).join('');
 
+<<<<<<< HEAD
+=======
+    const isAdmin = this.currentUser && this.currentUser.role === 'admin';
+    const adminActionsHtml = isAdmin ? `
+      <button class="btn btn-sm btn-warning edit-hall-btn" data-hall-id="${hall.id}" title="Edit Hall">
+        <i class="fas fa-edit"></i>
+      </button>
+      <button class="btn btn-sm btn-danger delete-hall-btn" data-hall-id="${hall.id}" title="Delete Hall">
+        <i class="fas fa-trash"></i>
+      </button>
+    ` : '';
+
+>>>>>>> recover-last-work
     return `
       <div class="hall-card" data-hall-id="${hall.id}">
         <div class="hall-header">
@@ -142,6 +449,10 @@ class HallsPage {
           <button class="btn btn-primary btn-sm select-hall-btn" data-hall-id="${hall.id}">
             Select Hall
           </button>
+<<<<<<< HEAD
+=======
+          ${adminActionsHtml}
+>>>>>>> recover-last-work
         </div>
       </div>
     `;
@@ -163,6 +474,30 @@ class HallsPage {
       });
     });
 
+<<<<<<< HEAD
+=======
+    // Edit hall buttons (admin only)
+    document.querySelectorAll('.edit-hall-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const hallId = parseInt(btn.dataset.hallId);
+        const hall = await this.getHallById(hallId);
+        if (hall) {
+          this.openHallModal(hall);
+        }
+      });
+    });
+
+    // Delete hall buttons (admin only)
+    document.querySelectorAll('.delete-hall-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const hallId = parseInt(btn.dataset.hallId);
+        this.deleteHall(hallId);
+      });
+    });
+
+>>>>>>> recover-last-work
     // Hall card clicks
     document.querySelectorAll('.hall-card').forEach(card => {
       card.addEventListener('click', (e) => {
@@ -174,6 +509,26 @@ class HallsPage {
     });
   }
 
+<<<<<<< HEAD
+=======
+  async getHallById(hallId) {
+    const API_BASE = window.API_BASE || 'http://localhost:8000';
+    try {
+      const response = await fetch(`${API_BASE}/api/halls/${hallId}`);
+      if (response.ok) {
+        const hall = await response.json();
+        return window.dataStorage.serverToHall ? window.dataStorage.serverToHall(hall) : hall;
+      }
+    } catch (error) {
+      console.error('Error fetching hall:', error);
+    }
+    
+    // Fallback to localStorage
+    const halls = window.dataStorage.getHalls();
+    return halls.find(h => h.id === hallId);
+  }
+
+>>>>>>> recover-last-work
   selectHall(hallId) {
     // Remove previous selection
     document.querySelectorAll('.hall-card').forEach(card => {
@@ -313,8 +668,16 @@ class HallsPage {
   async handleBookingSubmit() {
     const submitBtn = document.querySelector('#booking-form button[type="submit"]');
     
+<<<<<<< HEAD
     // Validate form
     if (!this.validateBookingForm()) {
+=======
+    console.log('handleBookingSubmit called');
+    
+    // Validate form
+    if (!this.validateBookingForm()) {
+      console.log('Form validation failed');
+>>>>>>> recover-last-work
       return;
     }
 
@@ -333,6 +696,13 @@ class HallsPage {
       // Build booking payload from form
       const formData = window.FormUtils.getFormData('booking-form');
       const hallIdParsed = parseInt(formData['hall-id']);
+<<<<<<< HEAD
+=======
+      
+      console.log('Form data:', formData);
+      console.log('Hall ID:', hallIdParsed);
+      
+>>>>>>> recover-last-work
       // Validate hall id
       if (!hallIdParsed || Number.isNaN(hallIdParsed)) {
         window.authUtils.showAlert('Selected hall is invalid. Please select a hall and try again.', 'error');
@@ -351,16 +721,34 @@ class HallsPage {
         status: 'pending'
       };
 
+<<<<<<< HEAD
+=======
+      console.log('Booking payload:', payload);
+
+>>>>>>> recover-last-work
       // Try to POST to backend if available
       const API_BASE = window.API_BASE || 'http://localhost:8000';
       let backendBooking = null;
       try {
+<<<<<<< HEAD
+=======
+        console.log('Sending booking to backend:', `${API_BASE}/api/bookings`);
+>>>>>>> recover-last-work
         const resp = await fetch(`${API_BASE}/api/bookings`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+<<<<<<< HEAD
         const json = await resp.json().catch(() => null);
+=======
+        
+        console.log('Response status:', resp.status);
+        
+        const json = await resp.json().catch(() => null);
+        console.log('Response data:', json);
+        
+>>>>>>> recover-last-work
         if (resp.ok) {
           backendBooking = json;
         } else {
@@ -650,6 +1038,11 @@ class HallsPage {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
   if (window.location.pathname.endsWith('halls.html')) {
+<<<<<<< HEAD
+=======
+    console.log('DOMContentLoaded - Initializing HallsPage');
+    console.log('modalManager available:', !!window.modalManager);
+>>>>>>> recover-last-work
     window.hallsPage = new HallsPage();
     window.hallsPage.setupBookingActions();
   }

@@ -161,6 +161,7 @@ class AdminDashboard {
     `).join('');
   }
 
+<<<<<<< HEAD
   loadPendingBookings() {
     const pendingBookingsContainer = document.getElementById('pending-bookings');
     if (!pendingBookingsContainer) return;
@@ -194,6 +195,72 @@ class AdminDashboard {
         </div>
       </div>
     `).join('');
+=======
+  async loadPendingBookings() {
+    const pendingBookingsContainer = document.getElementById('pending-bookings');
+    if (!pendingBookingsContainer) return;
+
+    try {
+      const API_BASE = window.API_BASE || 'http://localhost:8000';
+      const response = await fetch(`${API_BASE}/api/bookings?status=pending`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch bookings');
+      }
+
+      const bookings = await response.json();
+      
+      if (!Array.isArray(bookings) || bookings.length === 0) {
+        pendingBookingsContainer.innerHTML = '<p class="text-muted">No pending bookings</p>';
+        return;
+      }
+
+      // Sort by created_at descending
+      bookings.sort((a, b) => {
+        const dateA = new Date(a.created_at || a.createdAt);
+        const dateB = new Date(b.created_at || b.createdAt);
+        return dateB - dateA;
+      });
+
+      // Take top 5
+      const topBookings = bookings.slice(0, 5);
+
+      pendingBookingsContainer.innerHTML = topBookings.map(booking => {
+        const hallName = booking.hallName || booking.hall_name || 'Unknown Hall';
+        const userName = booking.username || booking.user_name || booking.userName || 'Unknown User';
+        const purpose = booking.purpose || 'No purpose specified';
+        const date = booking.date || 'No date';
+        const startTime = booking.start_time || booking.startTime || '';
+        const attendees = booking.attendees || 0;
+        
+        return `
+          <div class="dashboard-item">
+            <div class="item-info">
+              <h5>${hallName}</h5>
+              <p class="item-meta">
+                <span><i class="fas fa-user"></i> ${userName}</span>
+                <span><i class="fas fa-calendar"></i> ${date}</span>
+                ${startTime ? `<span><i class="fas fa-clock"></i> ${startTime}</span>` : ''}
+              </p>
+              <p class="item-purpose"><i class="fas fa-info-circle"></i> ${purpose}</p>
+              ${attendees > 0 ? `<p class="item-attendees"><i class="fas fa-users"></i> ${attendees} attendees</p>` : ''}
+            </div>
+            <div class="item-actions">
+              <button class="action-btn approve" onclick="window.adminDashboard.approveBooking(${booking.id})" title="Approve">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="action-btn reject" onclick="window.adminDashboard.rejectBooking(${booking.id})" title="Reject">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (error) {
+      console.error('Error loading pending bookings:', error);
+      pendingBookingsContainer.innerHTML = '<p class="text-muted" style="color: red;">Error loading bookings</p>';
+    }
+>>>>>>> recover-last-work
   }
 
   // Events Tab
@@ -226,7 +293,11 @@ class AdminDashboard {
     });
   }
 
+<<<<<<< HEAD
   loadEventsTable() {
+=======
+  async loadEventsTable() {
+>>>>>>> recover-last-work
     const tableBody = document.getElementById('events-table-body');
     if (!tableBody) return;
 
@@ -235,8 +306,38 @@ class AdminDashboard {
     const category = document.getElementById('events-category-filter')?.value || '';
     const status = document.getElementById('events-status-filter')?.value || '';
 
+<<<<<<< HEAD
     const filters = { search, category, status };
     const events = window.dataStorage.filterEvents(filters);
+=======
+    // Try to fetch events from backend API first
+    let events = [];
+    const API_BASE = window.API_BASE || 'http://localhost:8000';
+    try {
+      let url = `${API_BASE}/api/events`;
+      const params = new URLSearchParams();
+      if (category) params.set('category', category);
+      if (status) params.set('status', status);
+      if (search) params.set('search', search);
+      if (params.toString()) url += '?' + params.toString();
+      
+      const resp = await fetch(url);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data)) {
+          events = data.map(e => window.dataStorage.serverToEvent ? window.dataStorage.serverToEvent(e) : e);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch events from backend:', err);
+    }
+    
+    // Fallback to localStorage
+    if (events.length === 0) {
+      const filters = { search, category, status };
+      events = window.dataStorage.filterEvents(filters);
+    }
+>>>>>>> recover-last-work
 
     // Sort by date (newest first)
     events.sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
@@ -322,6 +423,7 @@ class AdminDashboard {
     });
   }
 
+<<<<<<< HEAD
   loadBookingsTable() {
     const tableBody = document.getElementById('bookings-table-body');
     if (!tableBody) return;
@@ -334,15 +436,61 @@ class AdminDashboard {
     if (pendingCount) pendingCount.textContent = `${bookingStats.pending} Pending`;
     if (approvedCount) approvedCount.textContent = `${bookingStats.approved} Approved`;
 
+=======
+  async loadBookingsTable() {
+    const tableBody = document.getElementById('bookings-table-body');
+    if (!tableBody) return;
+
+>>>>>>> recover-last-work
     // Get filters
     const search = document.getElementById('bookings-search')?.value || '';
     const status = document.getElementById('bookings-status-filter')?.value || '';
     const hallId = document.getElementById('bookings-hall-filter')?.value || '';
 
+<<<<<<< HEAD
     const filters = { search, status };
     if (hallId) filters.hallId = parseInt(hallId);
 
     const bookings = window.dataStorage.filterBookings(filters);
+=======
+    // Try to fetch bookings from backend API first
+    let bookings = [];
+    const API_BASE = window.API_BASE || 'http://localhost:8000';
+    try {
+      let url = `${API_BASE}/api/bookings`;
+      const params = new URLSearchParams();
+      if (status) params.set('status', status);
+      if (hallId) params.set('hallId', hallId);
+      if (search) params.set('search', search);
+      if (params.toString()) url += '?' + params.toString();
+      
+      const resp = await fetch(url);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data)) {
+          bookings = data.map(b => window.dataStorage.serverToBooking ? window.dataStorage.serverToBooking(b) : b);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch bookings from backend:', err);
+    }
+    
+    // Fallback to localStorage
+    if (bookings.length === 0) {
+      const filters = { search, status };
+      if (hallId) filters.hallId = parseInt(hallId);
+      bookings = window.dataStorage.filterBookings(filters);
+    }
+
+    // Update status counts
+    const pendingCount = document.getElementById('pending-count');
+    const approvedCount = document.getElementById('approved-count');
+    const pending = bookings.filter(b => b.status === 'pending').length;
+    const approved = bookings.filter(b => b.status === 'approved').length;
+    
+    if (pendingCount) pendingCount.textContent = `${pending} Pending`;
+    if (approvedCount) approvedCount.textContent = `${approved} Approved`;
+>>>>>>> recover-last-work
 
     // Sort by date (newest first)
     bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -418,11 +566,38 @@ class AdminDashboard {
     }
   }
 
+<<<<<<< HEAD
   loadHallsGrid() {
     const hallsGrid = document.getElementById('admin-halls-grid');
     if (!hallsGrid) return;
 
     const halls = window.dataStorage.getHalls();
+=======
+  async loadHallsGrid() {
+    const hallsGrid = document.getElementById('admin-halls-grid');
+    if (!hallsGrid) return;
+
+    // Try to fetch halls from backend API first
+    let halls = [];
+    const API_BASE = window.API_BASE || 'http://localhost:8000';
+    try {
+      const resp = await fetch(`${API_BASE}/api/halls`);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data)) {
+          halls = data.map(h => window.dataStorage.serverToHall ? window.dataStorage.serverToHall(h) : h);
+          localStorage.setItem('cms_halls', JSON.stringify(halls));
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch halls from backend:', err);
+    }
+    
+    // Fallback to localStorage
+    if (halls.length === 0) {
+      halls = window.dataStorage.getHalls();
+    }
+>>>>>>> recover-last-work
 
     if (halls.length === 0) {
       hallsGrid.innerHTML = `
@@ -502,7 +677,11 @@ class AdminDashboard {
     }
   }
 
+<<<<<<< HEAD
   loadUsersTable() {
+=======
+  async loadUsersTable() {
+>>>>>>> recover-last-work
     const tableBody = document.getElementById('users-table-body');
     const totalUsersEl = document.getElementById('total-users');
     
@@ -512,6 +691,7 @@ class AdminDashboard {
     const search = document.getElementById('users-search')?.value.toLowerCase() || '';
     const role = document.getElementById('users-role-filter')?.value || '';
 
+<<<<<<< HEAD
     let users = window.dataStorage.getUsers();
 
     // Apply filters
@@ -525,6 +705,52 @@ class AdminDashboard {
 
     if (role) {
       users = users.filter(user => user.role === role);
+=======
+    // Try to fetch users from backend API first
+    let users = [];
+    const API_BASE = window.API_BASE || 'http://localhost:8000';
+    try {
+      let url = `${API_BASE}/api/users`;
+      const params = new URLSearchParams();
+      if (role) params.set('role', role);
+      if (search) params.set('search', search);
+      if (params.toString()) url += '?' + params.toString();
+      
+      const resp = await fetch(url);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data)) {
+          users = data.map(u => ({
+            id: u.id,
+            username: u.username,
+            fullName: u.fullName || u.full_name || '',
+            email: u.email,
+            role: u.role,
+            joinedDate: u.joinedAt || u.joined_at || new Date().toISOString()
+          }));
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch users from backend:', err);
+    }
+    
+    // Fallback to localStorage
+    if (users.length === 0) {
+      users = window.dataStorage.getUsers();
+      
+      // Apply filters locally
+      if (search) {
+        users = users.filter(user => 
+          user.username.toLowerCase().includes(search) ||
+          (user.fullName || '').toLowerCase().includes(search) ||
+          user.email.toLowerCase().includes(search)
+        );
+      }
+
+      if (role) {
+        users = users.filter(user => user.role === role);
+      }
+>>>>>>> recover-last-work
     }
 
     // Update total count
@@ -624,8 +850,11 @@ class AdminDashboard {
     window.LoadingManager.show(submitBtn);
 
     try {
+<<<<<<< HEAD
       await new Promise(resolve => setTimeout(resolve, 500));
 
+=======
+>>>>>>> recover-last-work
       const formData = window.FormUtils.getFormData('hall-form');
       const hallId = formData['hall-edit-id'];
 
@@ -643,6 +872,7 @@ class AdminDashboard {
         isAvailable: true
       };
 
+<<<<<<< HEAD
       if (hallId) {
         // Update existing hall
         window.dataStorage.updateHall(hallId, hallData);
@@ -651,6 +881,46 @@ class AdminDashboard {
         // Create new hall
         window.dataStorage.addHall(hallData);
         window.authUtils.showAlert('Hall created successfully!', 'success');
+=======
+      const API_BASE = window.API_BASE || 'http://localhost:8000';
+
+      if (hallId) {
+        // Update existing hall via API
+        try {
+          const resp = await fetch(`${API_BASE}/api/halls/${hallId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(hallData)
+          });
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.error || 'Failed to update hall');
+          }
+          window.authUtils.showAlert('Hall updated successfully!', 'success');
+        } catch (err) {
+          console.error('Backend update failed:', err);
+          window.dataStorage.updateHall(hallId, hallData);
+          window.authUtils.showAlert('Hall updated locally (backend unavailable)', 'warning');
+        }
+      } else {
+        // Create new hall via API
+        try {
+          const resp = await fetch(`${API_BASE}/api/halls`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(hallData)
+          });
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.error || 'Failed to create hall');
+          }
+          window.authUtils.showAlert('Hall created successfully!', 'success');
+        } catch (err) {
+          console.error('Backend create failed:', err);
+          window.dataStorage.addHall(hallData);
+          window.authUtils.showAlert('Hall created locally (backend unavailable)', 'warning');
+        }
+>>>>>>> recover-last-work
       }
 
       window.modalManager.closeModal('hall-modal');
@@ -763,11 +1033,27 @@ class AdminDashboard {
     if (!confirmed) return;
 
     try {
+<<<<<<< HEAD
+=======
+      const API_BASE = window.API_BASE || 'http://localhost:8000';
+      const resp = await fetch(`${API_BASE}/api/bookings/${bookingId}`, { method: 'DELETE' });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to delete booking');
+      }
+>>>>>>> recover-last-work
       window.dataStorage.deleteBooking(bookingId);
       window.authUtils.showAlert('Booking deleted successfully!', 'success');
       this.loadBookingsTable();
     } catch (error) {
+<<<<<<< HEAD
       window.authUtils.showAlert('Error deleting booking', 'error');
+=======
+      console.error('Error deleting booking:', error);
+      window.dataStorage.deleteBooking(bookingId);
+      window.authUtils.showAlert('Booking deleted locally', 'warning');
+      this.loadBookingsTable();
+>>>>>>> recover-last-work
     }
   }
 
@@ -812,11 +1098,27 @@ class AdminDashboard {
     if (!confirmed) return;
 
     try {
+<<<<<<< HEAD
+=======
+      const API_BASE = window.API_BASE || 'http://localhost:8000';
+      const resp = await fetch(`${API_BASE}/api/events/${eventId}`, { method: 'DELETE' });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to delete event');
+      }
+>>>>>>> recover-last-work
       window.dataStorage.deleteEvent(eventId);
       window.authUtils.showAlert('Event deleted successfully!', 'success');
       this.loadEventsTable();
     } catch (error) {
+<<<<<<< HEAD
       window.authUtils.showAlert('Error deleting event', 'error');
+=======
+      console.error('Error deleting event:', error);
+      window.dataStorage.deleteEvent(eventId);
+      window.authUtils.showAlert('Event deleted locally', 'warning');
+      this.loadEventsTable();
+>>>>>>> recover-last-work
     }
   }
 
@@ -838,11 +1140,27 @@ class AdminDashboard {
     if (!confirmed) return;
 
     try {
+<<<<<<< HEAD
+=======
+      const API_BASE = window.API_BASE || 'http://localhost:8000';
+      const resp = await fetch(`${API_BASE}/api/halls/${hallId}`, { method: 'DELETE' });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to delete hall');
+      }
+>>>>>>> recover-last-work
       window.dataStorage.deleteHall(hallId);
       window.authUtils.showAlert('Hall deleted successfully!', 'success');
       this.loadHallsGrid();
     } catch (error) {
+<<<<<<< HEAD
       window.authUtils.showAlert('Error deleting hall', 'error');
+=======
+      console.error('Error deleting hall:', error);
+      window.dataStorage.deleteHall(hallId);
+      window.authUtils.showAlert('Hall deleted locally', 'warning');
+      this.loadHallsGrid();
+>>>>>>> recover-last-work
     }
   }
 
@@ -893,11 +1211,27 @@ class AdminDashboard {
     if (!confirmed) return;
 
     try {
+<<<<<<< HEAD
+=======
+      const API_BASE = window.API_BASE || 'http://localhost:8000';
+      const resp = await fetch(`${API_BASE}/api/users/${userId}`, { method: 'DELETE' });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to delete user');
+      }
+>>>>>>> recover-last-work
       window.dataStorage.deleteUser(userId);
       window.authUtils.showAlert('User deleted successfully!', 'success');
       this.loadUsersTable();
     } catch (error) {
+<<<<<<< HEAD
       window.authUtils.showAlert('Error deleting user', 'error');
+=======
+      console.error('Error deleting user:', error);
+      window.dataStorage.deleteUser(userId);
+      window.authUtils.showAlert('User deleted locally', 'warning');
+      this.loadUsersTable();
+>>>>>>> recover-last-work
     }
   }
 }
