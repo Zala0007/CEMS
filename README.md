@@ -231,12 +231,6 @@ npx http-server -c-1 -p 8080
 
 ---
 
-If you want, I can:
-
-- Add a single `run-dev.ps1` script that starts the PHP dev server and opens the frontend page in your browser (I'll create it so it uses default ports and can be customized).
-- Add a `frontend/README.md` with quick-start instructions for serving the frontend.
-
-Which would you prefer me to add next? (I can implement `run-dev.ps1` now if you want a single-click start.)
 =======
 # Campus Event Management System
 
