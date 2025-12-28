@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - College Event Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="admin-layout">
+    <header class="admin-header">
+        <div class="admin-nav">
+            <div class="admin-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Admin Panel</span>
+            </div>
+            <div class="admin-user">
+                <span id="admin-name">Admin</span>
+                <button class="btn btn-outline btn-sm" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <aside class="admin-sidebar">
+        <nav class="admin-menu">
+            <a href="#dashboard" class="menu-item active" data-tab="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                Dashboard
+            </a>
+            <a href="#events" class="menu-item" data-tab="events">
+                <i class="fas fa-calendar-alt"></i>
+                Events
+            </a>
+            <a href="#bookings" class="menu-item" data-tab="bookings">
+                <i class="fas fa-building"></i>
+                Hall Bookings
+            </a>
+            <a href="#halls" class="menu-item" data-tab="halls">
+                <i class="fas fa-door-open"></i>
+                Manage Halls
+            </a>
+            <a href="#users" class="menu-item" data-tab="users">
+                <i class="fas fa-users"></i>
+                Users
+            </a>
+        </nav>
+    </aside>
+
+    <main class="admin-main">
+        <!-- Dashboard Tab -->
+        <div class="admin-content active" id="dashboard-tab">
+            <div class="content-header">
+                <h1>Dashboard</h1>
+                <p>Overview of college events and bookings</p>
+            </div>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="dash-total-events">0</h3>
+                        <p>Total Events</p>
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="dash-approved-bookings">0</h3>
+                        <p>Approved Bookings</p>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="dash-pending-bookings">0</h3>
+                        <p>Pending Bookings</p>
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="dash-total-halls">0</h3>
+                        <p>Total Halls</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>Recent Events</h3>
+                        <a href="#events" class="view-all" data-tab="events">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div id="recent-events">
+                            <!-- Recent events will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3>Pending Bookings</h3>
+                        <a href="#bookings" class="view-all" data-tab="bookings">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div id="pending-bookings">
+                            <!-- Pending bookings will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Tab -->
+        <div class="admin-content" id="events-tab">
+            <div class="content-header">
+                <h1>Events Management</h1>
+                <button class="btn btn-primary" id="add-admin-event">
+                    <i class="fas fa-plus"></i>
+                    Add Event
+                </button>
+            </div>
+
+            <div class="table-container">
+                <div class="table-filters">
+                    <input type="text" class="form-input" id="events-search" placeholder="Search events...">
+                    <select class="form-select" id="events-category-filter">
+                        <option value="">All Categories</option>
+                        <option value="academic">Academic</option>
+                        <option value="cultural">Cultural</option>
+                        <option value="sports">Sports</option>
+                        <option value="workshop">Workshop</option>
+                        <option value="seminar">Seminar</option>
+                    </select>
+                    <select class="form-select" id="events-status-filter">
+                        <option value="">All Status</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Category</th>
+                                <th>Date</th>
+                                <th>Venue</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="events-table-body">
+                            <!-- Events will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Tab -->
+        <div class="admin-content" id="bookings-tab">
+            <div class="content-header">
+                <h1>Hall Bookings</h1>
+                <div class="content-stats">
+                    <span class="stat-badge pending" id="pending-count">0 Pending</span>
+                    <span class="stat-badge approved" id="approved-count">0 Approved</span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-filters">
+                    <input type="text" class="form-input" id="bookings-search" placeholder="Search bookings...">
+                    <select class="form-select" id="bookings-status-filter">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <select class="form-select" id="bookings-hall-filter">
+                        <option value="">All Halls</option>
+                    </select>
+                </div>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Hall</th>
+                                <th>Purpose</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-table-body">
+                            <!-- Bookings will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Halls Tab -->
+        <div class="admin-content" id="halls-tab">
+            <div class="content-header">
+                <h1>Halls Management</h1>
+                <button class="btn btn-primary" id="add-hall">
+                    <i class="fas fa-plus"></i>
+                    Add Hall
+                </button>
+            </div>
+
+            <div class="halls-grid" id="admin-halls-grid">
+                <!-- Halls will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div class="admin-content" id="users-tab">
+            <div class="content-header">
+                <h1>Users Management</h1>
+                <div class="content-stats">
+                    <span class="stat-badge info" id="total-users">0 Users</span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-filters">
+                    <input type="text" class="form-input" id="users-search" placeholder="Search users...">
+                    <select class="form-select" id="users-role-filter">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="student">Student</option>
+                    </select>
+                </div>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Hall Modal -->
+    <div class="modal" id="hall-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="hall-modal-title">Add New Hall</h3>
+                <button class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="hall-form">
+                <input type="hidden" id="hall-edit-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Hall Name</label>
+                        <input type="text" class="form-input" id="hall-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Capacity</label>
+                        <input type="number" class="form-input" id="hall-capacity" min="1" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" class="form-input" id="hall-location" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Facilities</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox">
+                            <input type="checkbox" value="projector">
+                            <span class="checkmark"></span>
+                            Projector
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" value="sound-system">
+                            <span class="checkmark"></span>
+                            Sound System
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" value="air-conditioning">
+                            <span class="checkmark"></span>
+                            Air Conditioning
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" value="wifi">
+                            <span class="checkmark"></span>
+                            Wi-Fi
+                        </label>
+                        <label class="checkbox">
+                            <input type="checkbox" value="stage">
+                            <span class="checkmark"></span>
+                            Stage
+                        </label>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Hall</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert" id="alert">
+        <div class="alert-content">
+            <i class="alert-icon"></i>
+            <span class="alert-message"></span>
+        </div>
+        <button class="alert-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

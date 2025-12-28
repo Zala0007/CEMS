@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar - College Event Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>College Events</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="events.html" class="nav-link">Events</a></li>
+                    <li><a href="halls.html" class="nav-link">Halls</a></li>
+                    <li><a href="calendar.html" class="nav-link active">Calendar</a></li>
+                    <li><a href="admin.html" class="nav-link admin-only" style="display: none;">Admin</a></li>
+                    <li><a href="#" class="nav-link" id="user-menu">
+                        <i class="fas fa-user"></i>
+                        <span id="user-name">Guest</span>
+                    </a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Event Calendar</h1>
+                <div class="calendar-controls">
+                    <button class="btn btn-outline" id="prev-month">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span class="current-month" id="current-month">January 2025</span>
+                    <button class="btn btn-outline" id="next-month">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <button class="btn btn-primary" id="today-btn">Today</button>
+                </div>
+            </div>
+
+            <div class="calendar-container">
+                <div class="calendar-sidebar">
+                    <div class="calendar-legend">
+                        <h3>Legend</h3>
+                        <div class="legend-items">
+                            <div class="legend-item">
+                                <span class="legend-color event-academic"></span>
+                                <span>Academic Events</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color event-cultural"></span>
+                                <span>Cultural Events</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color event-sports"></span>
+                                <span>Sports Events</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color event-workshop"></span>
+                                <span>Workshops</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color event-seminar"></span>
+                                <span>Seminars</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color booking-approved"></span>
+                                <span>Hall Bookings</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calendar-filters">
+                        <h3>Filters</h3>
+                        <div class="filter-options">
+                            <label class="checkbox">
+                                <input type="checkbox" id="show-events" checked>
+                                <span class="checkmark"></span>
+                                Show Events
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" id="show-bookings" checked>
+                                <span class="checkmark"></span>
+                                Show Bookings
+                            </label>
+                        </div>
+                        <div class="category-filters">
+                            <label class="checkbox">
+                                <input type="checkbox" class="category-filter" data-category="academic" checked>
+                                <span class="checkmark"></span>
+                                Academic
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" class="category-filter" data-category="cultural" checked>
+                                <span class="checkmark"></span>
+                                Cultural
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" class="category-filter" data-category="sports" checked>
+                                <span class="checkmark"></span>
+                                Sports
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" class="category-filter" data-category="workshop" checked>
+                                <span class="checkmark"></span>
+                                Workshop
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" class="category-filter" data-category="seminar" checked>
+                                <span class="checkmark"></span>
+                                Seminar
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calendar-main">
+                    <div class="calendar" id="calendar">
+                        <div class="calendar-header">
+                            <div class="calendar-day-header">Sun</div>
+                            <div class="calendar-day-header">Mon</div>
+                            <div class="calendar-day-header">Tue</div>
+                            <div class="calendar-day-header">Wed</div>
+                            <div class="calendar-day-header">Thu</div>
+                            <div class="calendar-day-header">Fri</div>
+                            <div class="calendar-day-header">Sat</div>
+                        </div>
+                        <div class="calendar-body" id="calendar-body">
+                            <!-- Calendar days will be generated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="calendar-events-list" id="calendar-events-list">
+                <h3>Events & Bookings for <span id="selected-date">Today</span></h3>
+                <div class="events-list" id="selected-events">
+                    <!-- Events for selected date will be shown here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Event Details Modal -->
+    <div class="modal" id="event-details-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="event-details-title">Event Details</h3>
+                <button class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="event-details-body">
+                <!-- Event details will be shown here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/calendar.js"></script>
+</body>
+</html>
